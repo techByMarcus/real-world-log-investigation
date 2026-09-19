@@ -1,129 +1,90 @@
-# Real-World Log Investigation
+# Authentication Log Investigation
 
-## 🚨 Scenario
-A simulated security alert was triggered in a SOC environment due to multiple failed login attempts followed by a successful login from an unfamiliar IP address.
+A simulated SOC case involving repeated failed login attempts followed by a successful login from an unfamiliar IP address.
 
----
+This repository documents how I worked through the alert, what evidence was available, why the sequence was suspicious, and what I would verify next in a production environment.
 
-## 🎯 Objective
-Determine whether this activity represents a legitimate login or a potential account compromise.
+## Alert Summary
 
----
+The alert involved three important observations:
 
-## 🛠️ Tools Used
-- Log analysis (simulated)
-- SIEM concepts
-- Basic networking knowledge
+1. Multiple failed authentication attempts
+2. Repeated activity from the same source IP
+3. A successful login after the failed attempts from an IP address not previously associated with the user
 
----
+The investigation question was whether the sequence could be explained by normal user behavior or whether it was more consistent with credential compromise.
 
-## 🔍 Investigation Steps
+## Evidence Reviewed
 
-1. Reviewed login logs for failed attempts  
-2. Identified repeated failures from same IP address  
-3. Detected successful login immediately after failed attempts  
-4. Observed that failed attempts occurred within a short time window (indicative of automated attack behavior)  
-5. Compared login behavior against normal patterns  
-6. Reviewed IP origin for anomalies  
+| Evidence | Why it mattered |
+| --- | --- |
+| Repeated failed logins | Established that the activity was not a single mistyped password |
+| Same source IP across attempts | Showed concentration of activity from one source |
+| Short time window | Made automated or repeated guessing more plausible |
+| Successful login after failures | Increased the risk that valid credentials had eventually been used |
+| Unfamiliar source IP | Made the successful authentication less consistent with known user behavior |
+| Prior login pattern | Provided a baseline for deciding whether the source was unusual |
 
----
+## Investigation
 
-## 🧠 Analysis
+I started with the failed authentication events and looked for repetition: whether the failures came from one source or several, how closely they occurred together, and whether the same account was involved.
 
-- Multiple failed login attempts indicate a possible brute force attack  
-- Successful login after repeated failures suggests credential compromise  
-- IP address was not previously associated with the user  
-- Potential risk of unauthorized access to sensitive systems or data if not mitigated  
+The failed attempts were concentrated around the same source and occurred in a short period. I then reviewed the later successful authentication. Because the success followed the failures and came from an unfamiliar IP address, I treated the event as more serious than a routine password mistake.
 
----
+At that point, the evidence supported escalation, but it still did not prove who was behind the login. In a real SOC, I would need additional context before calling the account definitively compromised.
 
-## 🚨 Decision
+## Analyst Assessment
 
-Classified as a **True Positive (Potential Account Compromise)** and escalated according to incident response procedures.
+**Disposition:** Likely true positive — potential account compromise.
 
----
+The strongest indicator was the sequence itself: repeated failures followed by a successful authentication from an unfamiliar source.
 
-## 🔐 Recommended Actions
+I would escalate the alert for additional validation rather than close it as benign.
 
-- Force password reset  
-- Enable multi-factor authentication (MFA)  
-- Block suspicious IP address  
-- Monitor account activity  
+## Recommended Response
 
----
+Immediate actions would depend on the environment and the account involved, but the next steps I would recommend are:
 
-## 📌 Key Takeaways
+- Validate the login with the account owner
+- Review successful and failed authentication activity before and after the event
+- Reset credentials if the login cannot be verified
+- Require or confirm multi-factor authentication
+- Review whether the source IP appears against other users or systems
+- Restrict or block the source if it is confirmed malicious
+- Monitor the account for follow-on activity
 
-- Demonstrated ability to analyze logs and detect suspicious patterns  
-- Differentiated between normal activity and potential threats  
-- Applied structured investigation process  
-- Made clear escalation decision  
+## What I Would Verify in Production
 
----
+Before finalizing the incident, I would want additional telemetry and business context:
 
-## 🎥 Video Walkthrough
+- VPN or remote-access logs
+- Device identity and endpoint telemetry
+- Whether the source belongs to approved corporate infrastructure
+- Whether the account is privileged
+- Geolocation and impossible-travel indicators
+- Any privilege changes, mailbox activity, file access, or lateral movement after the successful login
+- Threat-intelligence context for the source IP
 
-Demonstration of full investigation process and decision-making:
+That distinction matters: the lab evidence was enough to justify escalation, but not enough to claim complete attribution or prove every stage of an account compromise.
 
-Owner avatar
-real-world-log-investigation
-Public
-techByMarcus/real-world-log-investigation
-Go to file
-t
-Name		
-techByMarcus
-techByMarcus
-Add files via upload
-00d3ce3
- · 
-now
-README.md
-Revise README for clarity and consistency
-11 hours ago
-finalsimpresentation.mp4
-Add files via upload
-now
-Repository files navigation
-README
-Real-World Log Investigation
-🚨 Scenario
-A simulated security alert was triggered in a SOC environment due to multiple failed login attempts followed by a successful login from an unfamiliar IP address.
+## Scope
 
-🎯 Objective
-Determine whether this activity represents a legitimate login or a potential account compromise.
+This is a **simulated training investigation**, not production SOC casework.
 
-🛠️ Tools Used
-Log analysis (simulated)
-SIEM concepts
-Basic networking knowledge
-🔍 Investigation Steps
-Reviewed login logs for failed attempts
-Identified repeated failures from same IP address
-Detected successful login immediately after failed attempts
-Observed that failed attempts occurred within a short time window (indicative of automated attack behavior)
-Compared login behavior against normal patterns
-Reviewed IP origin for anomalies
-🧠 Analysis
-Multiple failed login attempts indicate a possible brute force attack
-Successful login after repeated failures suggests credential compromise
-IP address was not previously associated with the user
-Potential risk of unauthorized access to sensitive systems or data if not mitigated
-🚨 Decision
-Classified as a True Positive (Potential Account Compromise) and escalated according to incident response procedures.
+The repository is intended to show the decision process behind the alert review: identify the pattern, compare it with expected behavior, determine what the evidence supports, and document what additional information is still needed.
 
-🔐 Recommended Actions
-Force password reset
-Enable multi-factor authentication (MFA)
-Block suspicious IP address
-Monitor account activity
-📌 Key Takeaways
-Demonstrated ability to analyze logs and detect suspicious patterns
-Differentiated between normal activity and potential threats
-Applied structured investigation process
-Made clear escalation decision
-🎥 Video Walkthrough
-Demonstration of full investigation process and decision-making
+## Video Walkthrough
 
+A walkthrough of the investigation is included in this repository:
 
-[Watch the Walkthrough](https://1drv.ms/v/c/6300dd9e66455bb4/IQBN5gGwLOtSRY9s3RrkyAuFAXWsjNEHSijdlywmsVKI5bc?e=OQwwft)
+[View the repository video](./finalsimpresentation.mp4)
+
+An external copy is also available here:
+
+[Watch the walkthrough on OneDrive](https://1drv.ms/v/c/6300dd9e66455bb4/IQBN5gGwLOtSRY9s3RrkyAuFAXWsjNEHSijdlywmsVKI5bc?e=OQwwft)
+
+## Related Work
+
+- [SOC Analyst Portfolio](https://github.com/techByMarcus/soc-analyst-portfolio)
+- [Security Audit Tool](https://github.com/techByMarcus/security-audit-tool)
+- [Portfolio](https://techbymarcus.github.io/aboutMarcus/)
